@@ -1,0 +1,5 @@
+{% extends "home.html" %}
+{% block content %}
+<p>{{message}}</p>
+<a href = "{{site_paths.data_site}}{{file.url_full_path()}}/{{file.name}}">Back to previous location.</a>
+{% endblock %}

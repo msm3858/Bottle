@@ -1,0 +1,64 @@
+{% extends "home.html" %}
+{% block content %}
+{% if file.url_path != '' %}
+<a class="btn btn-primary btn-sm btn-block" role="button" href="{{site_paths.data_site}}{{file.url_full_path()}}">Previous location.</a>
+
+{% else %}
+<a class="btn btn-primary btn-sm btn-block" role="button" href="{{site_paths.home_site}}">Previous location.</a>
+{% endif %}
+<div class="container mt-3">
+	<h2>Upload file into current directory</h2>
+
+	<form action="/upload" method="post" enctype="multipart/form-data">
+		<input type="file" id="upload" name="upload">
+		<input type="hidden" id="path" name="path" value="{{file.url_path}}">
+		<input type="hidden" id="configuration" name="configuration" value={{file.configuration.url}}>
+		<div class="mt-3">
+			<button type="submit" class="btn btn-primary">Upload</button>
+		</div>
+	</form>
+</div>
+<div class="container">
+	{% if file.get_files() %}
+		<h2>Files in {{file.url_path}}:</h2>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>File</th>
+					<th>Download</th>
+					<th>Remove</th>
+				</tr>
+			</thead>
+			<tbody>
+			{%for local_file in file.get_files() %}
+				<tr>
+					{% if local_file['is_directory'] %}
+						<td><a href={{site_paths.data_site}}{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}>{{ local_file['name'] }}</a></td>
+					{% else %}
+						<td>{{ local_file['name'] }}</td>
+					{% endif %}
+					{% if local_file['is_file'] %}
+						<td>
+							<a class="btn btn-warning btn-sm btn-block" role="button" href="{{site_paths.data_site}}{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}">Download</a>
+						</td>
+					{% else %}
+						<td> </td>
+					{% endif %}
+					{% if not local_file['is_directory'] %}
+					<td>
+						<a class="btn btn-danger btn-sm btn-block" role="button" href="/remove/{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}">Remove</a>
+					</td>
+					{% else %}
+					<td> </td>
+					{% endif %}
+
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<p>There is no files to view.</p>
+	{% endif %}
+</div>
+
+{% endblock %}
