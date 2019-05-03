@@ -6,6 +6,7 @@
 {% else %}
 <a class="btn btn-primary btn-sm btn-block" role="button" href="{{site_paths.home_site}}">Previous location.</a>
 {% endif %}
+
 <div class="container mt-3">
 	<h2>Upload file into current directory</h2>
 
@@ -18,25 +19,50 @@
 		</div>
 	</form>
 </div>
+
+<div class="container mt-3">
+	<h2>Filter files</h2>
+
+	<form action="{{site_paths.data_site}}{{file.url_full_path()}}/{{file.name}}" method="post">
+		<input type="text" id="mask" name="mask" placeholder="*" value="">
+		<div class="mt-3">
+			<button type="submit" class="btn btn-primary">Filter</button>
+		</div>
+	</form>
+</div>
+
 <div class="container">
-	{% if file.get_files() %}
-		<h2>Files in {{file.url_path}}:</h2>
+	{% if file.list_files() %}
+		<h2>Files in {{file.configuration.name}}{{file.url_path}}:</h2>
 		<table class="table table-bordered">
 			<thead>
 				<tr>
 					<th>File</th>
+					<th>Created</th>
+					<th>Modified</th>
+					<th>Size</th>
 					<th>Download</th>
 					<th>Remove</th>
 				</tr>
 			</thead>
 			<tbody>
-			{%for local_file in file.get_files() %}
+			{%for local_file in file.list_files() %}
 				<tr>
 					{% if local_file['is_directory'] %}
 						<td><a href={{site_paths.data_site}}{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}>{{ local_file['name'] }}</a></td>
 					{% else %}
 						<td>{{ local_file['name'] }}</td>
 					{% endif %}
+						<td>{{ local_file['created'] }}</td>
+					{% if local_file['is_file'] %}
+						<td>{{ local_file['modified'] }}</td>
+						<td>{{ local_file['size'] }}</td>
+					{% else %}
+						<td> </td>
+						<td> </td>
+					{% endif %}
+
+
 					{% if local_file['is_file'] %}
 						<td>
 							<a class="btn btn-warning btn-sm btn-block" role="button" href="{{site_paths.data_site}}{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}">Download</a>
@@ -56,6 +82,7 @@
 			{% endfor %}
 			</tbody>
 		</table>
+		<p>Viewing {{ file.list_files()|length }} of {{ file.count_not_filtered_files }} in current directory.</p>
 	{% else %}
 		<p>There is no files to view.</p>
 	{% endif %}

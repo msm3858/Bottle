@@ -26,36 +26,6 @@ for configuration in configurations_dictionary.keys():
 			limit_per_site=limit_per_site
 		)
 	)
-
-
-# LIST VIEWS:
-
-@app.route('/')
-@view('home.html')
-def home():
-	return {'site_paths': site_paths, 'configurations': http_configurations}
-
-
-@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
-@view('list_dir.html')
-def path(root, directory=''):
-	configuration = http_configurations.get_configuration_by_url(root)
-	file = HttpFile(configuration=configuration, path=directory)
-	file.set_properties()
-
-	if file.is_file:
-		return static_file(
-			file.name,
-			root=f"{file.configuration.local_path}{file.previous_path}",
-			download=file.name)
-
-	return {
-		'site_paths': site_paths,
-		'file': file,
-	}
-
-
 # FILE MANAGEMENT:
 
 # # Handling uploading file.
@@ -75,16 +45,51 @@ def do_upload():
 		file_path = f"{file.full_path()}/{upload.filename}"
 
 		upload.save(file_path)
-		message = f"File successfully saved to '{file.full_path()}, [file={upload.filename}]."
+		message = f"File successfully saved to '{file.configuration.name}{file.url_path}, [file={upload.filename}]."
 	# File overwritting exception handler.
 	except OSError as exception:
-		message = f"File already exists. FULL_PATH: {file.full_path()}"
+		message = f"File already exists. {file.configuration.name}{file.url_path}"
 	except AttributeError as exception:
 		message = "File not specified."
 
 	return {
 		'site_paths': site_paths,
 		'message': message,
+		'file': file,
+	}
+
+
+# LIST VIEWS:
+
+
+@app.route('/')
+@view('home.html')
+def home():
+	return {'site_paths': site_paths, 'configurations': http_configurations}
+
+# Handling uploading file.
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@view('list_dir.html')
+def path(root, directory=''):
+	file_mask = None
+	if request.forms.get('mask'):
+		file_mask = request.forms.get('mask')
+	configuration = http_configurations.get_configuration_by_url(root)
+	file = HttpFile(configuration=configuration, path=directory)
+	if file_mask:
+		file.mask = file_mask
+	file.set_properties()
+	if file.is_file:
+		return static_file(
+			file.name,
+			root=f"{file.configuration.local_path}{file.previous_path}",
+			download=file.name)
+
+	return {
+		'site_paths': site_paths,
 		'file': file,
 	}
 

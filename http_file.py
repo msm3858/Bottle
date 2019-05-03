@@ -1,4 +1,7 @@
+import datetime
+import glob
 import os
+import time
 
 
 class HttpFile:
@@ -7,8 +10,10 @@ class HttpFile:
 		self._url_path = path
 		self._previous_path = None
 		self._files = []
+		self._count_not_filtered_files = 0
 		self._name = None
 		self._extension = None
+		self._mask = '*'
 		self._is_directory = False
 		self._is_file = False
 		self._is_downloadable = True
@@ -20,12 +25,20 @@ class HttpFile:
 		return self._configuration
 
 	@property
+	def count_not_filtered_files(self):
+		return self._count_not_filtered_files
+
+	@property
 	def url_path(self):
 		return self._url_path
 
 	@property
 	def previous_path(self):
 		return self._previous_path
+
+	@property
+	def mask(self):
+		return self._mask
 
 	@property
 	def name(self):
@@ -59,6 +72,10 @@ class HttpFile:
 	def configuration(self, configuration):
 		self._configuration = configuration
 
+	@mask.setter
+	def mask(self, mask):
+		self._mask = mask
+
 	@name.setter
 	def name(self, name):
 		self._name = name
@@ -86,15 +103,11 @@ class HttpFile:
 		return f"{self.configuration.url}{self.previous_path}"
 
 	def set_properties(self):
-		print(f"FFPP: {self.full_path()}")
-		print(f"{os.path.isfile(self.full_path())}")
 		self._is_file = os.path.isfile(self.full_path())
 		self._is_directory = os.path.isdir(self.full_path())
 		_, self._extension = os.path.splitext(self.full_path())
 		self._name = '/'.join(self._url_path.split('/')[-1:])
 		self._previous_path = '/'.join(self._url_path.split('/')[:-1])
-		print(f"PREVDIR: {self._previous_path}")
-		print(f"URLPATH: {self._url_path}")
 		if not self._previous_path:
 			self._previous_path = ''
 		if self._is_directory:
@@ -102,16 +115,57 @@ class HttpFile:
 			self.is_removable = False
 			self.is_visible = True
 
-	def get_files(self):
+	def list_files(self):
+		return self.get_filtered_files()
+
+
+	def get_filtered_files(self):
 		self._files = []
-		if self._is_directory:
-			files = os.listdir(self.full_path())
-			for file in files:
-				is_file = os.path.isfile(os.path.join(self.full_path(), file))
-				is_directory = os.path.isdir(os.path.join(self.full_path(), file))
-				self._files.append({
-					'name': file,
-					'is_file': is_file,
-					'is_directory': is_directory,
-				})
-		return self._files[:self._configuration.limit_per_site]
+		current_dir = os.getcwd()
+		os.chdir(self.full_path())
+		self._count_not_filtered_files = len(os.listdir('.'))
+		files = glob.glob(self._mask)
+		self._files = self.set_files_properties(files)
+		os.chdir(current_dir)
+		return self.get_limited_files()
+
+	def get_limited_files(self):
+		if self._configuration.limit_per_site != 0:
+			return self._files[:self._configuration.limit_per_site]
+		else:
+			return self._files
+
+	def set_files_properties(self, files):
+		files_list = []
+		for file in files:
+			file_path = os.path.join(self.full_path(), file)
+			is_file = os.path.isfile(file_path)
+			is_directory = os.path.isdir(file_path)
+			# created = time.ctime(os.path.getctime(file_path))
+			created = datetime.datetime.fromtimestamp(
+				os.path.getctime(file_path)).strftime('%Y-%m-%d %H:%M:%S')
+
+			# modified = time.ctime(os.path.getmtime(file_path))
+			modified = datetime.datetime.fromtimestamp(
+				os.path.getmtime(file_path)).strftime('%Y-%m-%d %H:%M:%S')
+			size = os.path.getsize(file_path)
+			mb = 2**20
+			kb = 2**10
+			# Check is size is greater than 1MB
+			if size >= mb:
+				size = "%.2f MB" % round(size/mb, 2)
+			# Check is size is greater than 1KB
+			elif size >= kb:
+				size = "%.2f KB" % round(size / kb, 2)
+			else:
+				size = f"{size} B"
+
+			files_list.append({
+				'name': file,
+				'is_file': is_file,
+				'is_directory': is_directory,
+				'created': created,
+				'modified': modified,
+				'size': size,
+			})
+		return files_list
