@@ -10,11 +10,11 @@
 {% endif %}
 
 
-<div class="container-fluid">
+<div class="container-fluid" style="border:1px solid #333333;">
 	<div class="row">
 		<!--Upload handler-->
-		<div class="col-sm-6" style="background-color:lavender;">
-			<h2>Upload file into current directory</h2>
+		<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
+			<h2>Upload file into current directory:</h2>
 
 			<form action="/upload" method="post" enctype="multipart/form-data">
 				<input type="file" id="upload" name="upload">
@@ -26,9 +26,9 @@
 			</form>
 		</div>
 		<!--Filter handler-->
-		<div class="col-sm-6" style="background-color:lavender;">
+		<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
 
-		<h2>Filter files</h2>
+		<h2>Filter files:</h2>
 		<form action="{{site_paths.data_site}}p{{page}}/{{file.url_full_path()}}/{{file.name}}" method="post">
 			<input type="text" class="form-control input-lg " id="mask" name="mask" placeholder="Mask for file..." value="{{ file.mask }}">
 			<div class="mt-3">
