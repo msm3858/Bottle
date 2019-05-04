@@ -5,7 +5,9 @@ import os
 from bottle import jinja2_view, redirect, route, request, run, template, error, static_file
 
 from http_configuration_dictionary import configurations_dictionary, limit_per_site
-from fileManagerConfig import HttpConfiguration, HttpConfigurations, SitePath
+from httpConfiguration import HttpConfiguration
+from httpConfigurations import HttpConfigurations
+from sitePath import SitePath
 from http_file import HttpFile
 
 view = functools.partial(jinja2_view, template_lookup=['templates'])
@@ -15,6 +17,7 @@ app = bottle.Bottle()
 http_configurations = HttpConfigurations()
 site_paths = SitePath()
 
+# Load configurations from http_configuration_directory.py
 for configuration in configurations_dictionary.keys():
 	http_configurations.add_configuration(
 		HttpConfiguration(
@@ -26,6 +29,8 @@ for configuration in configurations_dictionary.keys():
 			limit_per_site=limit_per_site
 		)
 	)
+
+
 # FILE MANAGEMENT:
 
 # # Handling uploading file.
@@ -43,12 +48,11 @@ def do_upload():
 
 	try:
 		file_path = f"{file.full_path()}/{upload.filename}"
-
 		upload.save(file_path)
 		message = f"File successfully saved to '{file.configuration.name}{file.url_path}, [file={upload.filename}]."
-	# File overwritting exception handler.
+	# File overwriting exception handler.
 	except OSError as exception:
-		message = f"File already exists. {file.configuration.name}{file.url_path}"
+		message = f"File already exists at {file.configuration.name}{file.url_path}"
 	except AttributeError as exception:
 		message = "File not specified."
 
@@ -67,6 +71,7 @@ def do_upload():
 def home():
 	return {'site_paths': site_paths, 'configurations': http_configurations}
 
+
 # Handling uploading file.
 # POST PAGES
 @app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
@@ -78,7 +83,7 @@ def home():
 @app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
-@view('list_dir.html')
+@view('list.html')
 def path(root, directory='', page=1):
 	file_mask = None
 	if request.forms.get('mask'):
@@ -88,7 +93,8 @@ def path(root, directory='', page=1):
 	if file_mask:
 		file.mask = file_mask
 	file.set_site_properties()
-	file.set_files_from_directory()
+	if file.is_directory:
+		file.set_files_from_directory()
 	if file.is_file:
 		return static_file(
 			file.name,

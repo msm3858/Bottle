@@ -2,7 +2,6 @@ import datetime
 import glob
 import math
 import os
-import time
 
 
 class HttpFile:
