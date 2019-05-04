@@ -102,7 +102,10 @@
 			<p>Viewing {{ file.count_filtered_files }} filtered file of {{ file.count_not_filtered_files }} in current directory.</p>
 		{% endif %}
 	{% else %}
-		<p>There is no files to view.</p>
+	<div class="alert alert-danger" role="alert" style="text-align: center;">
+		<h1>There is no files to view.</h1>
+	</div>
+
 	{% endif %}
 </div>
 

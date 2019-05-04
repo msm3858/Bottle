@@ -196,4 +196,4 @@ class HttpFile:
 				'modified': modified,
 				'size': size,
 			})
-		return sorted(files_list, key = lambda field: field['name'])
+		return sorted(sorted(files_list, key = lambda field: field['name']), key = lambda field: field['is_directory'], reverse=True)

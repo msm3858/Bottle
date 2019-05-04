@@ -147,6 +147,6 @@ def remove(root, directory=''):
 @view('page_404.html')
 def mistake404(code):
 	return {
-		'message': "Page does not exist,",
+		'message': "Page does not exist.",
 		'site_paths': site_paths,
 	}
