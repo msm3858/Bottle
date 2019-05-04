@@ -1,32 +1,42 @@
 {% extends "home.html" %}
 {% block content %}
+
+<!--Previous button-->
 {% if file.url_path != '' %}
-<a class="btn btn-primary btn-sm btn-block" role="button" href="{{site_paths.data_site}}{{file.url_full_path()}}">Previous location.</a>
+<a class="btn btn-outline-info btn-lg btn-block" role="button" href="{{site_paths.data_site}}{{file.url_full_path()}}">Previous location.</a>
 
 {% else %}
-<a class="btn btn-primary btn-sm btn-block" role="button" href="{{site_paths.home_site}}">Previous location.</a>
+<a class="btn btn-outline-info btn-lg btn-block" role="button" href="{{site_paths.home_site}}">Previous location.</a>
 {% endif %}
-<div class="container mt-3">
-	<h2>Upload file into current directory</h2>
 
-	<form action="/upload" method="post" enctype="multipart/form-data">
-		<input type="file" id="upload" name="upload">
-		<input type="hidden" id="path" name="path" value="{{file.url_path}}">
-		<input type="hidden" id="configuration" name="configuration" value={{file.configuration.url}}>
-		<div class="mt-3">
-			<button type="submit" class="btn btn-primary">Upload</button>
-		</div>
-	</form>
-</div>
 
-<div class="container mt-3">
-	<h2>Filter files</h2>
-	<form action="{{site_paths.data_site}}p{{page}}/{{file.url_full_path()}}/{{file.name}}" method="post">
-		<input type="text" id="mask" name="mask" placeholder="Mask for file..." value="{{ file.mask }}">
-		<div class="mt-3">
-			<button type="submit" class="btn btn-primary">Filter</button>
+<div class="container-fluid">
+	<div class="row">
+		<!--Upload handler-->
+		<div class="col-sm-6" style="background-color:lavender;">
+			<h2>Upload file into current directory</h2>
+
+			<form action="/upload" method="post" enctype="multipart/form-data">
+				<input type="file" id="upload" name="upload">
+				<input type="hidden" id="path" name="path" value="{{file.url_path}}">
+				<input type="hidden" id="configuration" name="configuration" value={{file.configuration.url}}>
+				<div class="mt-3">
+					<button type="submit" class="btn btn-primary">Upload</button>
+				</div>
+			</form>
 		</div>
-	</form>
+		<!--Filter handler-->
+		<div class="col-sm-6" style="background-color:lavender;">
+
+		<h2>Filter files</h2>
+		<form action="{{site_paths.data_site}}p{{page}}/{{file.url_full_path()}}/{{file.name}}" method="post">
+			<input type="text" class="form-control input-lg " id="mask" name="mask" placeholder="Mask for file..." value="{{ file.mask }}">
+			<div class="mt-3">
+				<button type="submit" class="btn btn-primary">Filter</button>
+			</div>
+		</form>
+		</div>
+	</div>
 </div>
 
 <div class="container">
@@ -37,6 +47,7 @@
 		<table class="table table-bordered">
 			<thead>
 				<tr>
+					<th>No.</th>
 					<th>File</th>
 					<th>Created</th>
 					<th>Modified</th>
@@ -48,6 +59,7 @@
 			<tbody>
 			{% for local_file in file.list_files(page) %}
 				<tr>
+					<td>{{ loop.index }}</td>
 					{% if local_file['is_directory'] %}
 						<td><a href={{site_paths.data_site}}{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}>{{ local_file['name'] }}</a></td>
 					{% else %}
@@ -84,7 +96,11 @@
 		</table>
 
 		{% include 'pagination.html' %}
-		<p>Viewing {{ file.list_files(page)|length }} of {{ file.count_not_filtered_files }} in current directory.</p>
+		{% if file.count_filtered_files > 1 %}
+			<p>Viewing {{ file.count_filtered_files }} filtered files of {{ file.count_not_filtered_files }} in current directory.</p>
+		{% else %}
+			<p>Viewing {{ file.count_filtered_files }} filtered file of {{ file.count_not_filtered_files }} in current directory.</p>
+		{% endif %}
 	{% else %}
 		<p>There is no files to view.</p>
 	{% endif %}

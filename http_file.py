@@ -13,6 +13,7 @@ class HttpFile:
 		self._files = []
 		self._filtered_files = []
 		self._count_not_filtered_files = 0
+		self._count_filtered_files = 0
 		self._name = None
 		self._extension = None
 		self._mask = '*'
@@ -31,6 +32,9 @@ class HttpFile:
 	def count_not_filtered_files(self):
 		return self._count_not_filtered_files
 
+	@property
+	def count_filtered_files(self):
+		return self._count_filtered_files
 	@property
 	def pages(self):
 		return self._pages
@@ -136,6 +140,7 @@ class HttpFile:
 		os.chdir(self.full_path())
 		self._count_not_filtered_files = len(os.listdir('.'))
 		self._filtered_files= glob.glob(self._mask)
+		self._count_filtered_files = len(self._filtered_files)
 		self._pages = math.ceil(len(self._filtered_files)/self.configuration.limit_per_site)
 		self._files = self.set_files_properties(self._filtered_files)
 		os.chdir(current_dir)
