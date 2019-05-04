@@ -1,0 +1,69 @@
+	<div class="container">
+		<ul class="pagination">
+<!-- First handler. -->
+			<li class="page-item active">
+						<form action="{{ site_paths.data_site }}p1/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+							<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">First</button>
+						</form>
+			</li>
+<!-- Previous handler. -->
+			{% if page - 1 > 0 %}
+				<li class="page-item">
+						<form action="{{ site_paths.data_site }}p{{ page - 1 }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+							<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">Previous</button>
+						</form>
+				</li>
+			{% else %}
+				<li class="page-item disabled">
+						<form action="{{ site_paths.data_site }}p{{ page - 1 }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+							<input type="hidden" name="mask" value="{{ file.mask }}">
+    						<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">Previous</button>
+						</form>
+				</li>
+			{% endif %}
+<!-- Pages handler. -->
+			{% for i in range(1, file.pages + 1) %}
+				{% if i >= page - 5 and i <= page + 5 %}
+					{% if i == page %}
+						<li class="page-item active">
+							<form action="{{ site_paths.data_site }}p{{ loop.index }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+								<input type="hidden" name="mask" value="{{ file.mask }}">
+								<button type="submit" name="mask" value="{{ file.mask }}" class="page-link active">{{ loop.index }}</button>
+							</form>
+						</li>
+					{% else %}
+						<li class="page-item">
+							<form action="{{ site_paths.data_site }}p{{ loop.index }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+								<input type="hidden" name="mask" value="{{ file.mask }}">
+								<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">{{ loop.index }}</button>
+							</form>
+						</li>
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+
+<!-- Next handler. -->
+			{% if page + 1 <= file.pages %}
+				<li class="page-item">
+						<form action="{{ site_paths.data_site }}p{{ page + 1 }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+							<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">Next</button>
+						</form>
+				</li>
+			{% else %}
+				<li class="page-item disabled">
+						<form action="{{ site_paths.data_site }}p{{ page + 1 }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+							<input type="hidden" name="mask" value="{{ file.mask }}">
+    						<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">Next</button>
+						</form>
+				</li>
+			{% endif %}
+
+<!-- Last handler. -->
+			<li class="page-item active">
+				<form action="{{ site_paths.data_site }}p{{ file.pages }}/{{ file.url_full_path() }}/{{ file.name }}" method="post">
+					<button type="submit" name="mask" value="{{ file.mask }}" class="page-link">Last</button>
+				</form>
+			</li>
+		</ul>
+	</div>
+

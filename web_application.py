@@ -39,7 +39,7 @@ def do_upload():
 		configuration=http_configurations.get_configuration_by_url(configuration_url),
 		path=path)
 	upload = request.files.get('upload')
-	file.set_properties()
+	file.set_site_properties()
 
 	try:
 		file_path = f"{file.full_path()}/{upload.filename}"
@@ -68,12 +68,18 @@ def home():
 	return {'site_paths': site_paths, 'configurations': http_configurations}
 
 # Handling uploading file.
+# POST PAGES
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+# GET PAGES
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @view('list_dir.html')
-def path(root, directory=''):
+def path(root, directory='', page=1):
 	file_mask = None
 	if request.forms.get('mask'):
 		file_mask = request.forms.get('mask')
@@ -81,7 +87,8 @@ def path(root, directory=''):
 	file = HttpFile(configuration=configuration, path=directory)
 	if file_mask:
 		file.mask = file_mask
-	file.set_properties()
+	file.set_site_properties()
+	file.set_files_from_directory()
 	if file.is_file:
 		return static_file(
 			file.name,
@@ -91,6 +98,7 @@ def path(root, directory=''):
 	return {
 		'site_paths': site_paths,
 		'file': file,
+		'page': page,
 	}
 
 
@@ -100,7 +108,7 @@ def path(root, directory=''):
 def remove(root, directory=''):
 	configuration = http_configurations.get_configuration_by_url(root)
 	file = HttpFile(configuration=configuration, path=directory)
-	file.set_properties()
+	file.set_site_properties()
 
 	try:
 
@@ -113,7 +121,7 @@ def remove(root, directory=''):
 				file = HttpFile(
 					configuration=configuration,
 					path=file.previous_path)
-				file.set_properties()
+				file.set_site_properties()
 				message = "File was deleted successfully."
 
 		else:
@@ -121,7 +129,7 @@ def remove(root, directory=''):
 			file = HttpFile(
 				configuration=configuration,
 				path=file.previous_path)
-			file.set_properties()
+			file.set_site_properties()
 	# Handling file not found exception.
 	except FileNotFoundError as exception:
 		message = "Sorry, this file does not exist!"

@@ -1,5 +1,6 @@
 import datetime
 import glob
+import math
 import os
 import time
 
@@ -10,6 +11,7 @@ class HttpFile:
 		self._url_path = path
 		self._previous_path = None
 		self._files = []
+		self._filtered_files = []
 		self._count_not_filtered_files = 0
 		self._name = None
 		self._extension = None
@@ -19,6 +21,7 @@ class HttpFile:
 		self._is_downloadable = True
 		self._is_removable = True
 		self._is_visible = True
+		self._pages = 1
 
 	@property
 	def configuration(self):
@@ -27,6 +30,10 @@ class HttpFile:
 	@property
 	def count_not_filtered_files(self):
 		return self._count_not_filtered_files
+
+	@property
+	def pages(self):
+		return self._pages
 
 	@property
 	def url_path(self):
@@ -80,6 +87,10 @@ class HttpFile:
 	def name(self, name):
 		self._name = name
 
+	@pages.setter
+	def pages(self, pages):
+		self._pages = pages
+
 	@extension.setter
 	def extension(self, extension):
 		self._extension = extension
@@ -102,7 +113,7 @@ class HttpFile:
 	def url_full_path(self):
 		return f"{self.configuration.url}{self.previous_path}"
 
-	def set_properties(self):
+	def set_site_properties(self):
 		self._is_file = os.path.isfile(self.full_path())
 		self._is_directory = os.path.isdir(self.full_path())
 		_, self._extension = os.path.splitext(self.full_path())
@@ -115,23 +126,35 @@ class HttpFile:
 			self.is_removable = False
 			self.is_visible = True
 
-	def list_files(self):
-		return self.get_filtered_files()
+	def list_files(self, page=1):
+			return self.get_filtered_files(page)
 
-
-	def get_filtered_files(self):
+	def set_files_from_directory(self):
 		self._files = []
+		self._filtered_files = []
 		current_dir = os.getcwd()
 		os.chdir(self.full_path())
 		self._count_not_filtered_files = len(os.listdir('.'))
-		files = glob.glob(self._mask)
-		self._files = self.set_files_properties(files)
+		self._filtered_files= glob.glob(self._mask)
+		self._pages = math.ceil(len(self._filtered_files)/self.configuration.limit_per_site)
+		self._files = self.set_files_properties(self._filtered_files)
 		os.chdir(current_dir)
-		return self.get_limited_files()
 
-	def get_limited_files(self):
+
+	def get_filtered_files(self, page):
+		return self.get_limited_files(page)
+
+	def get_limited_files(self, page):
+		upper_limit = self._configuration.limit_per_site*page
+		if upper_limit > len(self._files):
+			upper_limit = len(self._files)
+
 		if self._configuration.limit_per_site != 0:
-			return self._files[:self._configuration.limit_per_site]
+			if page > 1:
+				lower_limit = self._configuration.limit_per_site*(page-1)
+			else:
+				lower_limit = 0
+			return self._files[lower_limit:upper_limit]
 		else:
 			return self._files
 
@@ -168,4 +191,4 @@ class HttpFile:
 				'modified': modified,
 				'size': size,
 			})
-		return files_list
+		return sorted(files_list, key = lambda field: field['name'])
