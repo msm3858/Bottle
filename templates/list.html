@@ -1,4 +1,5 @@
 {% extends "home.html" %}
+
 {% block content %}
 
 <!--Previous button-->
@@ -9,37 +10,18 @@
 <a class="btn btn-outline-info btn-lg btn-block" role="button" href="{{site_paths.home_site}}">Previous location.</a>
 {% endif %}
 
-
+<!--Filter + Upload-->
 <div class="container-fluid" style="border:1px solid #333333;">
 	<div class="row">
 		<!--Upload handler-->
-		<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
-			<h2>Upload file into current directory:</h2>
-
-			<form action="/upload" method="post" enctype="multipart/form-data">
-				<input type="file" id="upload" name="upload">
-				<input type="hidden" id="path" name="path" value="{{file.url_path}}">
-				<input type="hidden" id="configuration" name="configuration" value={{file.configuration.url}}>
-				<div class="mt-3">
-					<button type="submit" class="btn btn-primary">Upload</button>
-				</div>
-			</form>
-		</div>
+		{% include 'upload_handler.html' %}
 		<!--Filter handler-->
-		<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
-
-		<h2>Filter files:</h2>
-		<form action="{{site_paths.data_site}}p{{page}}/{{file.url_full_path()}}/{{file.name}}" method="post">
-			<input type="text" class="form-control input-lg " id="mask" name="mask" placeholder="Mask for file..." value="{{ file.mask }}">
-			<div class="mt-3">
-				<button type="submit" class="btn btn-primary">Filter</button>
-			</div>
-		</form>
-		</div>
+		{% include 'filter_handler.html' %}
 	</div>
 </div>
 
-<div class="container">
+<!--Data container-->
+<div class="container" style="background-color:#d6e0f5;">
 	{% if file.list_files(page) %}
 		<h2>Files in {{file.configuration.name}}{{file.url_path}}:</h2>
 

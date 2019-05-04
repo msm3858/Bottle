@@ -1,0 +1,9 @@
+		<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
+			<h2>Filter files:</h2>
+			<form action="{{site_paths.data_site}}p{{page}}/{{file.url_full_path()}}/{{file.name}}" method="post">
+				<input type="text" class="form-control input-lg " id="mask" name="mask" placeholder="Mask for file..." value="{{ file.mask }}">
+				<div class="mt-3">
+					<button type="submit" class="btn btn-primary">Filter</button>
+				</div>
+			</form>
+		</div>
