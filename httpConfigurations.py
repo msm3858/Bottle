@@ -32,9 +32,11 @@ class HttpConfigurations:
 
 	def get_configuration_by_url(self, url):
 		matching_configuration = None
+
 		for configuration in self._configurations:
 			if configuration.url == url:
 				matching_configuration = configuration
+
 		if matching_configuration:
 			return matching_configuration
 		else:

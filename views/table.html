@@ -1,0 +1,48 @@
+<table class="table table-bordered">
+	<thead class="thead-dark">
+		<tr>
+			<th>No.</th>
+			<th>File</th>
+			<th>Modified</th>
+			<th>Size</th>
+			<th>Download</th>
+			<th>Remove</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for local_file in file.list_files(page) %}
+		<tr>
+			<td>{{ loop.index }}</td>
+			{% if local_file['is_directory'] %}
+				<td><a href={{site_paths.data_site}}{{file.configuration.url}}{{file.url_path}}/{{local_file['name']}}>{{ local_file['name'] }}</a></td>
+			{% else %}
+				<td>{{ local_file['name'] }}</td>
+			{% endif %}
+			{% if local_file['is_file'] %}
+				<td>{{ local_file['modified'] }}</td>
+				<td>{{ local_file['size'] }}</td>
+			{% else %}
+				<td> </td>
+				<td> </td>
+			{% endif %}
+
+
+			{% if local_file['is_file'] %}
+				<td>
+					<a class="btn btn-warning btn-sm btn-block" role="button" href="{{ site_paths.data_site }}{{ file.configuration.url }}{{ file.url_path }}/{{ local_file['name'] }}">Download</a>
+				</td>
+			{% else %}
+				<td> </td>
+			{% endif %}
+			{% if not local_file['is_directory'] %}
+			<td>
+				<a class="btn btn-danger btn-sm btn-block" role="button" href="/remove/{{ file.configuration.url }}{{ file.url_path }}/{{ local_file['name'] }}">Remove</a>
+			</td>
+			{% else %}
+			<td> </td>
+			{% endif %}
+
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>

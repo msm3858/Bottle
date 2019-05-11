@@ -1,0 +1,13 @@
+{% extends "home.html" %}
+{% block content %}
+<div class="alert alert-primary" role="alert">
+  <h2><a href = "{{site_paths.data_site}}{{file.url_full_path()}}/{{file.name}}">Back to previous location.</a></h2>
+</div>
+<div class="alert alert-warning" role="alert" style="text-align: center;">
+    {% for message in messages %}
+        <h4>{{message}}</h4><br />
+    {% endfor %}
+</div>
+
+
+{% endblock %}

@@ -37,7 +37,9 @@ class HttpFile:
 	@property
 	def pages(self):
 		return self._pages
-
+	@property
+	def files(self):
+		return self._files
 	@property
 	def url_path(self):
 		return self._url_path
@@ -122,15 +124,17 @@ class HttpFile:
 		_, self._extension = os.path.splitext(self.full_path())
 		self._name = '/'.join(self._url_path.split('/')[-1:])
 		self._previous_path = '/'.join(self._url_path.split('/')[:-1])
+
 		if not self._previous_path:
 			self._previous_path = ''
+
 		if self._is_directory:
 			self.is_downloadable = False
 			self.is_removable = False
 			self.is_visible = True
 
 	def list_files(self, page=1):
-			return self.get_filtered_files(page)
+		return self.get_filtered_files(page)
 
 	def set_files_from_directory(self):
 		self._files = []
@@ -164,6 +168,7 @@ class HttpFile:
 
 	def set_files_properties(self, files):
 		files_list = []
+
 		for file in files:
 			file_path = os.path.join(self.full_path(), file)
 			is_file = os.path.isfile(file_path)
@@ -178,6 +183,7 @@ class HttpFile:
 			size = os.path.getsize(file_path)
 			mb = 2**20
 			kb = 2**10
+
 			# Check is size is greater than 1MB
 			if size >= mb:
 				size = "%.2f MB" % round(size/mb, 2)

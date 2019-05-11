@@ -3,7 +3,7 @@ import os
 
 from argparse import ArgumentParser
 
-from web_application import app
+from webApplication import app
 
 def parse_args():
 	parser = ArgumentParser()

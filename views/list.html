@@ -41,5 +41,14 @@
 
 	{% endif %}
 </div>
+<!--Delete many + Download many-->
+<div class="container-fluid" style="border:1px solid #333333;">
+	<div class="row">
+		<!--Upload handler-->
+		{% include 'remove_files_list.html' %}
+		<!--Filter handler-->
+		{% include 'download_files_list.html' %}
+	</div>
+</div>
 
 {% endblock %}
