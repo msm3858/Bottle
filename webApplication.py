@@ -11,7 +11,7 @@ from sitePath import SitePath
 from httpFile import HttpFile
 
 # view = functools.partial(jinja2_view, template_lookup=['templates'])
-bottle.TEMPLATE_PATH.insert(0, '/var/www/HttpFileManager/views/')
+bottle.TEMPLATE_PATH.insert(0, '/var/www/BottleFramework/views/')
 print(os.path.join(os.getcwd(), 'templates'))
 app = bottle.Bottle()
 

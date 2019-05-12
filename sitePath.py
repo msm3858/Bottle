@@ -9,20 +9,20 @@ class SitePath:
 
 	@property
 	def home_site(self):
-		return f'http://{self.hostname}:{self.port}'
+		return f'http://{self.hostname}'
 
 	@property
 	def data_site(self):
-		return f'http://{self.hostname}:{self.port}/fs/'
+		return f'http://{self.hostname}/fs/'
 
 	@property
 	def download_site(self):
-		return f'http://{self.hostname}:{self.port}/download/'
+		return f'http://{self.hostname}/download/'
 
 	@property
 	def delete_site(self):
-		return f'http://{self.hostname}:{self.port}/remove/'
+		return f'http://{self.hostname}/remove/'
 
 	@property
 	def upload_site(self):
-		return f'http://{self.hostname}:{self.port}/upload/'
+		return f'http://{self.hostname}/upload/'
