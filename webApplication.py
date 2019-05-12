@@ -1,10 +1,13 @@
 import bottle
 import os
+import sys
 from zipfile import ZipFile
 
 from bottle import jinja2_view, request, error, static_file
 
-from HttpConfigurationDictionary import configurations_dictionary, limit_per_site, hostname, app_name, port, views_path
+sys.path.extend(os.path.abspath(__file__))
+
+from HttpConfigurationDictionary import configurations_dictionary, limit_per_site, hostname, port, views_path
 from httpConfiguration import HttpConfiguration
 from httpConfigurations import HttpConfigurations
 from sitePath import SitePath
@@ -14,7 +17,7 @@ bottle.TEMPLATE_PATH.insert(0, views_path)
 app = bottle.Bottle()
 
 http_configurations = HttpConfigurations()
-site_paths = SitePath(hostname=hostname, port=port, app_name=app_name)
+site_paths = SitePath(hostname=hostname, port=port)
 
 # Load configurations from http_configuration_directory.py
 for configuration in configurations_dictionary.keys():
@@ -34,7 +37,7 @@ for configuration in configurations_dictionary.keys():
 
 # # Handling uploading file.
 
-@app.route(f'/{app_name}/upload', method='POST')
+@app.route(f'/upload', method='POST')
 @jinja2_view('redirection_site.html')
 def do_upload():
 	path = request.forms.get('path')
@@ -66,7 +69,7 @@ def do_upload():
 	}
 
 
-@app.route(f'/{app_name}/remove_files', method='POST')
+@app.route(f'/remove_files', method='POST')
 @jinja2_view('redirection_site.html')
 def remove_many():
 	path = request.forms.get('path')
@@ -103,10 +106,8 @@ def remove_many():
 	}
 
 
-@app.route(f'/{app_name}/download_files', method='POST')
+@app.route(f'/download_files', method='POST')
 def do_download_many():
-	print("DO")
-	print(os.getcwd())
 	path = request.forms.get('path')
 	configuration_url = request.forms.get('configuration')
 	file = HttpFile(
@@ -136,7 +137,6 @@ def do_download_many():
 
 
 @app.route('/')
-@app.route(f'/{app_name}')
 @jinja2_view('home.html')
 def home():
 	return {'site_paths': site_paths, 'configurations': http_configurations}
@@ -144,15 +144,15 @@ def home():
 
 # Handling uploading file.
 # POST PAGES
-@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
-@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
-@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
-@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
 # GET PAGES
-@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
-@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @jinja2_view('list.html')
 def path(root, directory='', page=1):
 	file_mask = None
@@ -182,8 +182,8 @@ def path(root, directory='', page=1):
 	}
 
 
-@app.route(f"/{app_name}/remove/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/{app_name}/remove/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/remove/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/remove/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @jinja2_view('redirect.html')
 def remove(root, directory=''):
 	configuration = http_configurations.get_configuration_by_url(root)
@@ -231,5 +231,4 @@ def mistake404(code):
 	}
 
 
-if __name__ == '__main__':
-	application = app
+application = app

@@ -1,12 +1,12 @@
 class SitePath:
-	def __init__(self, hostname, app_name, port=80):
+	def __init__(self, hostname, port=80):
 		self.hostname = hostname
 		self.port = port
-		self._site = f'http://{self.hostname}:{self.port}/{app_name}'
+		self._site = f'http://{self.hostname}:{self.port}'
 
 	@property
 	def server_home(self):
-		return f'http://{self.hostname}:{self.port}/'
+		return f'http://{self.hostname}'
 
 	@property
 	def home_site(self):

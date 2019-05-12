@@ -18,8 +18,8 @@ configurations_dictionary = {
 
 limit_per_site = 100
 
-hostname = 'localhost'
-port = 5000
+hostname = '192.168.1.108'
+port = 80
 
 app_name = 'mp'
 
