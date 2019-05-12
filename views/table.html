@@ -36,7 +36,7 @@
 			{% endif %}
 			{% if not local_file['is_directory'] %}
 			<td>
-				<a class="btn btn-danger btn-sm btn-block" role="button" href="/remove/{{ file.configuration.url }}{{ file.url_path }}/{{ local_file['name'] }}">Remove</a>
+				<a class="btn btn-danger btn-sm btn-block" role="button" href="{{site_paths.home_site}}/remove/{{ file.configuration.url }}{{ file.url_path }}/{{ local_file['name'] }}">Remove</a>
 			</td>
 			{% else %}
 			<td> </td>

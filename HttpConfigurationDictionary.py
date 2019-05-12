@@ -1,3 +1,6 @@
+import os
+
+
 configurations_dictionary = {
 	'Export': {
 		'url': 'export',
@@ -17,3 +20,10 @@ limit_per_site = 100
 
 hostname = 'localhost'
 port = 5000
+
+app_name = 'mp'
+
+www_content = '/var/www/BottleFramework/'
+views_directory = 'views'
+
+views_path = f"{os.path.join(www_content, views_directory)}/"

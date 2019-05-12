@@ -4,19 +4,17 @@ from zipfile import ZipFile
 
 from bottle import jinja2_view, request, error, static_file
 
-from HttpConfigurationDictionary import configurations_dictionary, limit_per_site, hostname, port
+from HttpConfigurationDictionary import configurations_dictionary, limit_per_site, hostname, app_name, port, views_path
 from httpConfiguration import HttpConfiguration
 from httpConfigurations import HttpConfigurations
 from sitePath import SitePath
 from httpFile import HttpFile
 
-# view = functools.partial(jinja2_view, template_lookup=['templates'])
-bottle.TEMPLATE_PATH.insert(0, '/var/www/BottleFramework/views/')
-print(os.path.join(os.getcwd(), 'templates'))
+bottle.TEMPLATE_PATH.insert(0, views_path)
 app = bottle.Bottle()
 
 http_configurations = HttpConfigurations()
-site_paths = SitePath(hostname=hostname, port=port)
+site_paths = SitePath(hostname=hostname, port=port, app_name=app_name)
 
 # Load configurations from http_configuration_directory.py
 for configuration in configurations_dictionary.keys():
@@ -36,7 +34,7 @@ for configuration in configurations_dictionary.keys():
 
 # # Handling uploading file.
 
-@app.route('/upload', method='POST')
+@app.route(f'/{app_name}/upload', method='POST')
 @jinja2_view('redirection_site.html')
 def do_upload():
 	path = request.forms.get('path')
@@ -53,6 +51,9 @@ def do_upload():
 			upload.save(file_path)
 			messages.append(f"File successfully saved to '{file.configuration.name}{file.url_path}, [file={upload.filename}].")
 		# File overwriting exception handler.
+		except PermissionError as exception:
+			messages.append("Contact your WebAdministrator - there is no permissions.")
+
 		except OSError as exception:
 			messages.append(f"File {upload.filename} already exists at {file.configuration.name}{file.url_path}.")
 		except AttributeError as exception:
@@ -65,7 +66,7 @@ def do_upload():
 	}
 
 
-@app.route('/remove_files', method='POST')
+@app.route(f'/{app_name}/remove_files', method='POST')
 @jinja2_view('redirection_site.html')
 def remove_many():
 	path = request.forms.get('path')
@@ -102,7 +103,7 @@ def remove_many():
 	}
 
 
-@app.route('/download_files', method='POST')
+@app.route(f'/{app_name}/download_files', method='POST')
 def do_download_many():
 	print("DO")
 	print(os.getcwd())
@@ -135,6 +136,7 @@ def do_download_many():
 
 
 @app.route('/')
+@app.route(f'/{app_name}')
 @jinja2_view('home.html')
 def home():
 	return {'site_paths': site_paths, 'configurations': http_configurations}
@@ -142,15 +144,15 @@ def home():
 
 # Handling uploading file.
 # POST PAGES
-@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
-@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
-@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
-@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
 # GET PAGES
-@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
-@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/{app_name}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/{app_name}/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @jinja2_view('list.html')
 def path(root, directory='', page=1):
 	file_mask = None
@@ -180,8 +182,8 @@ def path(root, directory='', page=1):
 	}
 
 
-@app.route(f"/remove/<root:re:{http_configurations.urls_pattern()}>")
-@app.route(f"/remove/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/{app_name}/remove/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/{app_name}/remove/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @jinja2_view('redirect.html')
 def remove(root, directory=''):
 	configuration = http_configurations.get_configuration_by_url(root)
@@ -227,3 +229,7 @@ def mistake404(code):
 		'message': "Page does not exist.",
 		'site_paths': site_paths,
 	}
+
+
+if __name__ == '__main__':
+	application = app
