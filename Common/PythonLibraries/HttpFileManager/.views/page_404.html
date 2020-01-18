@@ -1,0 +1,10 @@
+{% extends "home.html" %}
+{% block content %}
+	<div class="alert alert-danger" role="alert" style="text-align: center;">
+		<h1>{{message}}</h1>
+	</div>
+<div class="alert alert-primary" role="alert">
+  <h2><a href = "{{ site_paths.apache_dir }}/">Back to start location.</a></h2>
+</div>
+
+{% endblock %}

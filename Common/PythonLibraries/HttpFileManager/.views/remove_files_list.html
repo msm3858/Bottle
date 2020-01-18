@@ -1,0 +1,21 @@
+<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
+	<h2>Remove multiple files:</h2>
+
+	<form action="/{{ site_paths.apache_dir }}/remove_files" method="post" enctype="multipart/form-data">
+		<input type="hidden" id="path" name="path" value="{{file.url_path}}">
+		<input type="hidden" id="configuration" name="configuration" value={{file.configuration.url}}>
+        <div class="form-group">
+            <select multiple class="form-control" id="remove_files_list" name="remove_files_list" size="10">
+                {% for local_file in file.list_files(page) %}
+                    {% if local_file['is_file'] %}
+                        <option style="padding: 3px;font-weight: bold;" value="{{ local_file['name'] }}">{{ local_file['name'] }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+        </div>
+		<div class="mt-3">
+			<button type="submit" class="btn btn-primary">Remove</button>
+		</div>
+	</form>
+</div>

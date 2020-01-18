@@ -1,0 +1,54 @@
+{% extends "home.html" %}
+
+{% block content %}
+
+<!--Previous button-->
+{% if file.url_path != '' %}
+<a class="btn btn-outline-info btn-lg btn-block" role="button" href="{{site_paths.data_site}}{{file.url_full_path()}}">Previous location.</a>
+
+{% else %}
+<a class="btn btn-outline-info btn-lg btn-block" role="button" href="{{site_paths.home_site}}">Previous location.</a>
+{% endif %}
+
+<!--Filter + Upload-->
+<div class="container-fluid" style="border:1px solid #333333;">
+	<div class="row">
+		<!--Upload handler-->
+		{% include 'upload_handler.html' %}
+		<!--Filter handler-->
+		{% include 'filter_handler.html' %}
+	</div>
+</div>
+
+<!--Data container-->
+<div class="container" style="background-color:#d6e0f5;">
+	{% if file.list_files(page) %}
+		<h2>Files in {{file.configuration.name}}{{file.url_path}}:</h2>
+
+		{% include 'pagination.html' %}
+		{% include 'table.html' %}
+
+		{% include 'pagination.html' %}
+		{% if file.count_filtered_files > 1 %}
+			<p>Viewing {{ file.count_filtered_files }} filtered files of {{ file.count_not_filtered_files }} in current directory.</p>
+		{% else %}
+			<p>Viewing {{ file.count_filtered_files }} filtered file of {{ file.count_not_filtered_files }} in current directory.</p>
+		{% endif %}
+	{% else %}
+	<div class="alert alert-danger" role="alert" style="text-align: center;">
+		<h1>There is no files to view.</h1>
+	</div>
+
+	{% endif %}
+</div>
+<!--Delete many + Download many-->
+<div class="container-fluid" style="border:1px solid #333333;">
+	<div class="row">
+		<!--Upload handler-->
+		{% include 'remove_files_list.html' %}
+		<!--Filter handler-->
+		{% include 'download_files_list.html' %}
+	</div>
+</div>
+
+{% endblock %}

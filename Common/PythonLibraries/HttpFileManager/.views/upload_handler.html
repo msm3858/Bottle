@@ -1,0 +1,12 @@
+<div class="col-sm-6" style="background-color:#e6e6e6; border:1px solid #333333;">
+	<h2>Upload file into current directory:</h2>
+
+	<form action="/{{ site_paths.apache_dir }}/upload" method="post" enctype="multipart/form-data">
+		<input type="file" id="upload" name="upload" multiple>
+		<input type="hidden" id="path" name="path" value="{{file.url_path}}">
+		<input type="hidden" id="configuration" name="configuration" value={{file.configuration.url}}>
+		<div class="mt-3">
+			<button type="submit" class="btn btn-primary">Upload</button>
+		</div>
+	</form>
+</div>
