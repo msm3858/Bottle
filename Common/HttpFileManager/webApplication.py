@@ -36,7 +36,7 @@ for configuration in configurations_dictionary.keys():
 # FILE MANAGEMENT:
 
 # # Handling uploading file.
-
+@app.route(f'/{site_paths.apache_dir}/upload', method='POST')
 @app.route('/upload', method='POST')
 @jinja2_view('upload_confirm.html')
 def do_upload():
@@ -66,7 +66,8 @@ def do_upload():
 	}
 
 
-@app.route('/remove_files', method='POST')
+@app.route(f'/remove_files', method='POST')
+@app.route(f'/{site_paths.apache_dir}/remove_files', method='POST')
 @jinja2_view('upload_confirm.html')
 def remove_many():
 	path = request.forms.get('path')
@@ -104,6 +105,7 @@ def remove_many():
 
 
 @app.route('/download_files', method='POST')
+@app.route(f'/{site_paths.apache_dir}/download_files', method='POST')
 def do_download_many():
 	print("DO")
 	print(os.getcwd())
@@ -136,6 +138,7 @@ def do_download_many():
 
 
 @app.route('/')
+@app.route(f'/{site_paths.apache_dir}/')
 @jinja2_view('home.html')
 def home():
 	return {'site_paths': site_paths, 'configurations': http_configurations}
@@ -147,11 +150,21 @@ def home():
 @app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/{site_paths.apache_dir}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/{site_paths.apache_dir}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
+@app.route(f"/{site_paths.apache_dir}/fs/<root:re:{http_configurations.urls_pattern()}>", method='POST')
+@app.route(f"/{site_paths.apache_dir}/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>", method='POST')
 # GET PAGES
 @app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
 @app.route(f"/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}>")
 @app.route(f"/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+# GET PAGES
+@app.route(f"/{site_paths.apache_dir}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/{site_paths.apache_dir}/fs/p<page:int>/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/{site_paths.apache_dir}/fs/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/{site_paths.apache_dir}/fs/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+
 @jinja2_view('list.html')
 def path(root, directory='', page=1):
 	file_mask = None
@@ -184,6 +197,8 @@ def path(root, directory='', page=1):
 
 @app.route(f"/remove/<root:re:{http_configurations.urls_pattern()}>")
 @app.route(f"/remove/<root:re:{http_configurations.urls_pattern()}><directory:path>")
+@app.route(f"/{site_paths.apache_dir}/remove/<root:re:{http_configurations.urls_pattern()}>")
+@app.route(f"/{site_paths.apache_dir}/remove/<root:re:{http_configurations.urls_pattern()}><directory:path>")
 @jinja2_view('redirect.html')
 def remove(root, directory=''):
 	configuration = http_configurations.get_configuration_by_url(root)

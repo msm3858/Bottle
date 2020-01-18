@@ -1,7 +1,7 @@
 #! /bin/bash
 
-export WORKON_HOME=/home/msm/PycharmProjects/BottleNew/venv
-export PYTHONPATH="${PYTHONPATH}:/home/msm/PycharmProjects/BottleNew/"
+export WORKON_HOME=/home/msm/Programming/Bottle/venv
+export PYTHONPATH="${PYTHONPATH}:/home/msm/Programming/Bottle/"
 
 source ${WORKON_HOME}/mediapadBackend/bin/activate
 

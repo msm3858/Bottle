@@ -16,8 +16,8 @@ configurations_dictionary = {
 limit_per_site = 100
 
 hostname = 'localhost'
-port = 80
+port = 5000
 template_path = '/home/msm/PycharmProjects/BottleNew/Common/PythonLibraries/HttpFileManager/.views/'
-apache_dir = 'WebApp'
+apache_dir = 'aaa'
 # Directory where download.zip file is generated.
 temp_apache_directory = '/data/apache_temp/'
